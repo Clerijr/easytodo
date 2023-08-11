@@ -1,0 +1,10 @@
+{
+    "short_name": "EasyTodo",
+    "name": "An simple and easy todo list app",
+    "icons": [
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff"
+  }
