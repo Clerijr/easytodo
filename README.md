@@ -1,0 +1,2 @@
+# easytodo
+Simple todo app
