@@ -35,7 +35,8 @@ describe('App component', () => {
         fireEvent.click(addTaskButton)
         let task = screen.getByText('Remove Test')
         fireEvent.click(task)
-        expect(screen.getByText('Remove Test')).toBeNull()
+        task.debug()
+        expect(screen.getByText('Remove Test')).toBe()
     })
 
 })
