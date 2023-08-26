@@ -9,7 +9,7 @@ function TaskList() {
         <div className='taskList'>
             <ul>
                 {taskList.length > 0 ? taskList.map((task, key) =>
-                    <Task key={key} taskId={task.id} taskDesc={task.desc} />
+                    <Task key={key} taskId={task.id} taskDesc={task.description} />
                 ) : 'There are no tasks for today.'}
             </ul>
         </div>
