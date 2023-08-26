@@ -1,9 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
-/* 
-const BACKEND_URL ='https://easytodo-backend.vercel.app'
-const BACKEND_URL ='http://localhost:3001'
- */
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL
+
+const BACKEND_URL = 'https://easytodo-backend.vercel.app'
+//const BACKEND_URL ='http://localhost:3001'
+//const BACKEND_URL = process.env.REACT_APP_BACKEND_URL
 
 export const TodoContext = createContext();
 
@@ -15,22 +14,9 @@ export function useTodoContext() {
     return context
 }
 
-/* async function tryFetch() {
-    const response = await fetch(`${BACKEND_URL}/todos`, {
-        method: 'GET',
-        mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
-    const data = await response.json()
-    console.log(data)
-    return
-} */
-
-/* async function createTask(task) {
+async function createTask(task) {
     try {
-        const response = await fetch(`${BACKEND_URL}/todos`, {
+        await fetch(`${BACKEND_URL}/todos`, {
             method: 'POST',
             mode: 'cors',
             headers: {
@@ -38,14 +24,28 @@ export function useTodoContext() {
             },
             body: JSON.stringify(task)
         })
-        console.log('chamo create')
-        const data = await response.json()
-        console.log('Task Created: ', data)
-    } catch(e) {
+        console.log('Task Created')
+    } catch (e) {
+        console.error(e.name, e.message)
+    }
+    return
+}
+
+async function deleteTask(id) {
+    try {
+        await fetch(`${BACKEND_URL}/todos/${id}`, {
+            method: 'DELETE',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        console.log('Task Deleted')
+    } catch (e) {
         console.log(e)
     }
     return
-} */
+}
 
 
 export function TodoContextProvider({ children }) {
@@ -53,39 +53,36 @@ export function TodoContextProvider({ children }) {
 
     const [taskList, setTaskList] = useState([])
 
+    const fetchTasks = async function () {
+        const data = await (
+            await fetch(`${BACKEND_URL}/todos`, {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        ).json()
+        setTaskList(data)
+    }
+
     useEffect(() => {
-        const fetchTasks = async function () {
-            const data = await (
-                await fetch(`${BACKEND_URL}/todos`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-            ).json()
-            setTaskList(data)
-        }
         fetchTasks()
-    }, [taskList]);
-
-
+    }, []);
 
 
     async function addTask(e) {
         e.preventDefault()
         const taskDescription = document.getElementById('inputNewTask').value
-        const user = null
-        const card = null
+        const user = 'mock@user' // Todo
+        const card = null // Todo
         const newTask = {
             'description': taskDescription,
             'user': user || null,
-            'card': card || null,
-            'id': Math.random().toString(36).slice(2),
+            'card': card || null
         }
-        //createTask(newTask)
-        setTaskList((oldTaskList) => {
-            return [...oldTaskList, newTask]
+        createTask(newTask).then(() => {
+            fetchTasks()
         })
         document.getElementById('inputNewTask').value = ''
         return
@@ -93,10 +90,10 @@ export function TodoContextProvider({ children }) {
 
     async function removeTask(e) {
         e.preventDefault()
-        setTaskList((oldTaskList) => {
-            console.log(e.target)
-            return oldTaskList.filter((task) => task.id !== e.target.attributes.id.value)
-        })
+        deleteTask(e.target.attributes.id.value)
+            .then(() => {
+                fetchTasks()
+            })
         return
     }
 
